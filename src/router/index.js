@@ -33,6 +33,14 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/code-editor",
+    name: "code-editor",
+    component: () =>
+      import(
+        /* webpackChunkName: "bin-code-editor" */ "../views/CodeEditor/index.vue"
+      ),
+  },
 ];
 
 const router = new VueRouter({
