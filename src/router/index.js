@@ -19,6 +19,20 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
   },
+  {
+    path: "/elementui",
+    name: "elementui",
+    children: [
+      {
+        path: "input-number",
+        name: "input-number",
+        component: () =>
+          import(
+            /* webpackChunkName: "elementui" */ "../views/ElementUI/input-number.vue"
+          ),
+      },
+    ],
+  },
 ];
 
 const router = new VueRouter({
