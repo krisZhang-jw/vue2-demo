@@ -1,0 +1,44 @@
+diff --git a/node_modules/element-ui/lib/element-ui.common.js b/node_modules/element-ui/lib/element-ui.common.js
+index 5631486..8d61b3b 100644
+--- a/node_modules/element-ui/lib/element-ui.common.js
++++ b/node_modules/element-ui/lib/element-ui.common.js
+@@ -5296,6 +5296,7 @@ input_numbervue_type_template_id_42f8cf66_render._withStripped = true
+     value: {
+       immediate: true,
+       handler: function handler(value) {
++        console.log('element-ui common.js watch value', value)
+         var newVal = value === undefined ? value : Number(value);
+         if (newVal !== undefined) {
+           if (isNaN(newVal)) {
+diff --git a/node_modules/element-ui/lib/input-number.js b/node_modules/element-ui/lib/input-number.js
+index 223176e..31c4df5 100644
+--- a/node_modules/element-ui/lib/input-number.js
++++ b/node_modules/element-ui/lib/input-number.js
+@@ -695,6 +695,7 @@ var repeat_click = __webpack_require__(30);
+     }
+   },
+   mounted: function mounted() {
++    console.log('el-input-number mounted');
+     var innerInput = this.$refs.input.$refs.input;
+     innerInput.setAttribute('role', 'spinbutton');
+     innerInput.setAttribute('aria-valuemax', this.max);
+diff --git a/node_modules/element-ui/packages/input-number/src/input-number.vue b/node_modules/element-ui/packages/input-number/src/input-number.vue
+index 71aebd7..67ff167 100644
+--- a/node_modules/element-ui/packages/input-number/src/input-number.vue
++++ b/node_modules/element-ui/packages/input-number/src/input-number.vue
+@@ -26,6 +26,7 @@
+       @keydown.enter="increase">
+       <i :class="`el-icon-${controlsAtRight ? 'arrow-up' : 'plus'}`"></i>
+     </span>
++    <span class="el-input-number-test">新增加一个元素吧</span>
+     <el-input
+       ref="input"
+       :value="displayValue"
+@@ -115,6 +116,7 @@
+       value: {
+         immediate: true,
+         handler(value) {
++          console.log('这个是input-number的value', value);
+           let newVal = value === undefined ? value : Number(value);
+           if (newVal !== undefined) {
+             if (isNaN(newVal)) {

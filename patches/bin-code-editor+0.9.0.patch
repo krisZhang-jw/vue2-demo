@@ -1,0 +1,25 @@
+diff --git a/node_modules/bin-code-editor/lib/bin-code-editor.common.js b/node_modules/bin-code-editor/lib/bin-code-editor.common.js
+index 4d07eba..3871d5e 100644
+--- a/node_modules/bin-code-editor/lib/bin-code-editor.common.js
++++ b/node_modules/bin-code-editor/lib/bin-code-editor.common.js
+@@ -11214,7 +11214,7 @@ var render = function() {
+   var _vm = this
+   var _h = _vm.$createElement
+   var _c = _vm._self._c || _h
+-  return _c("div", { staticClass: "bin-json-editor", style: _vm.style }, [
++  return _c("div", { staticClass: "bin-json-editor bin-json-editor22222", style: _vm.style }, [
+     _c("label", [_c("textarea", { ref: "textarea" })])
+   ])
+ }
+diff --git a/node_modules/bin-code-editor/src/components/code-editor/code-editor.vue b/node_modules/bin-code-editor/src/components/code-editor/code-editor.vue
+index d881eee..37ef48e 100644
+--- a/node_modules/bin-code-editor/src/components/code-editor/code-editor.vue
++++ b/node_modules/bin-code-editor/src/components/code-editor/code-editor.vue
+@@ -1,6 +1,7 @@
+ <template>
+   <div class="bin-json-editor" :style="style">
+     <label>
++      <span>bin-code-editor</span>
+       <textarea ref="textarea"/>
+     </label>
+   </div>

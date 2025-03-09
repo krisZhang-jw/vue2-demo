@@ -19,19 +19,48 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
   },
+  // {
+  //   path: "/elementui",
+  //   name: "elementui",
+  //   children: [
+  //     {
+  //       path: "/input",
+  //       name: "input",
+  //       component: () => import(/* webpackChunkName: "elementui" */ '../views/ElementUI/input.vue')
+  //     },
+  //     {
+  //       path: "input-number",
+  //       name: "input-number",
+  //       component: () =>
+  //         import(
+  //           /* webpackChunkName: "elementui" */ "../views/ElementUI/input-number.vue"
+  //         ),
+  //     },
+  //   ],
+  // },
   {
-    path: "/elementui",
-    name: "elementui",
-    children: [
-      {
-        path: "input-number",
-        name: "input-number",
-        component: () =>
-          import(
-            /* webpackChunkName: "elementui" */ "../views/ElementUI/input-number.vue"
-          ),
-      },
-    ],
+    path: "/input",
+    name: "input",
+    component: () =>
+      import(
+        /* webpackChunkName: "bin-code-editor" */ "../views/ElementUI/input.vue"
+      ),
+  },
+  {
+    path: "/input2",
+    name: "input2",
+    component: () =>
+      import(
+        /* webpackChunkName: "bin-code-editor" */ "../views/ElementUI/input2.vue"
+      ),
+  },
+  {
+    path: "/input-number",
+    name: "input-number",
+    component: () =>
+      import(
+        /* webpackChunkName: "bin-code-editor" */ "../views/ElementUI/input-number.vue"
+      ),
   },
   {
     path: "/code-editor",
