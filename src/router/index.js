@@ -70,6 +70,11 @@ const routes = [
         /* webpackChunkName: "bin-code-editor" */ "../views/CodeEditor/index.vue"
       ),
   },
+  {
+    path: "/fabricjs",
+    name: "fabricjs",
+    component: () => import("../views/fabricjs/index.vue"),
+  },
 ];
 
 const router = new VueRouter({
