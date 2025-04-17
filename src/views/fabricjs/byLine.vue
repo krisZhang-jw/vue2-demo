@@ -28,8 +28,8 @@ export default {
       currentRect: null,
       selectedOption: null,
       rectLabelMap: new Map(), // 存储矩形与其标签的映射关系
-      polygonPoints: [],
-      currentPolygon: null,
+      polylinePoints: [], // 改为存储PolyLine的点
+      currentPolyline: null, // 改为PolyLine对象
       guideLine: null,
     };
   },
@@ -58,7 +58,7 @@ export default {
       this.canvas.on("selection:created", (e) => {
         const objs = e.selected;
         objs.forEach((obj) => {
-          if (obj.type === "rect" || obj.type === "polygon") {
+          if (obj.type === "rect" || obj.type === "polyline") {
             obj.set({
               fill: "rgba(173, 216, 230, 0.5)", // 浅蓝色填充
               stroke: "blue", // 蓝色边框
@@ -76,7 +76,7 @@ export default {
       this.canvas.on("selection:cleared", (e) => {
         const objs = this.canvas.getObjects();
         objs.forEach((obj) => {
-          if (obj.type === "rect" || obj.type === "polygon") {
+          if (obj.type === "rect" || obj.type === "polyline") {
             obj.set({
               fill: "transparent",
               stroke: "gray",
@@ -98,7 +98,7 @@ export default {
             return;
           }
           // 矩形、多边形直接选中
-          if (target?.type === "rect" || target?.type === "polygon") {
+          if (target?.type === "rect" || target?.type === "polyline") {
             this.selectObject(target);
             return;
           }
@@ -132,31 +132,25 @@ export default {
           this.canvas.renderAll();
         }
 
-        // 绘制多边形
+        // 绘制多线段
         if (this.isDrawingPolygon) {
-          // 如果是第一次点击，初始化多边形
-          if (this.polygonPoints.length === 0) {
-            this.polygonPoints = [pointer]; // 第一个固定点
+          // 如果是第一次点击，初始化多线段
+          if (this.polylinePoints.length === 0) {
+            this.polylinePoints = [pointer]; // 第一个固定点
 
-            // 创建多边形对象（初始只有1个点，显示为点）
-            this.currentPolygon = new fabric.Polygon(
-              [pointer, pointer, pointer],
-              {
-                fill: "transparent",
-                stroke: "gray",
-                strokeWidth: 1,
-                selectable: false,
-                objectCaching: false,
-                closed: true,
-              }
-            );
-            this.canvas.add(this.currentPolygon);
+            // 创建多线段对象（初始只有1个点，显示为点）
+            this.currentPolyline = new fabric.Polyline([pointer, pointer], {
+              fill: "transparent",
+              stroke: "gray",
+              strokeWidth: 1,
+              selectable: false,
+              objectCaching: false,
+            });
+            this.canvas.add(this.currentPolyline);
 
             // 创建辅助线
-            const firstPoint = this.polygonPoints[0];
-
             this.guideLine = new fabric.Line(
-              [firstPoint.x, firstPoint.y, pointer.x, pointer.y],
+              [pointer.x, pointer.y, pointer.x, pointer.y],
               {
                 stroke: "red",
                 strokeWidth: 1,
@@ -168,8 +162,8 @@ export default {
           }
           // 否则添加新固定点
           else {
-            this.polygonPoints.push(pointer);
-            this.updatePolygon();
+            this.polylinePoints.push(pointer);
+            this.updatePolyline();
           }
 
           this.canvas.renderAll();
@@ -202,7 +196,7 @@ export default {
 
         if (this.isDrawingPolygon) {
           const pointer = this.canvas.getPointer(options.e);
-          const firstPoint = this.polygonPoints[0];
+          const firstPoint = this.polylinePoints[0];
 
           // 更新辅助线
           if (this.guideLine) {
@@ -215,11 +209,11 @@ export default {
             this.guideLine.setCoords();
           }
 
-          // 更新多边形最后一个点（临时点）
-          if (this.currentPolygon && this.polygonPoints.length > 0) {
-            const points = [...this.polygonPoints, pointer];
-            this.currentPolygon.set({ points });
-            this.currentPolygon.setCoords();
+          // 更新多线段最后一个点（临时点）
+          if (this.currentPolyline && this.polylinePoints.length > 0) {
+            const points = [...this.polylinePoints, pointer];
+            this.currentPolyline.set({ points });
+            this.currentPolyline.setCoords();
           }
 
           this.canvas.renderAll();
@@ -239,12 +233,12 @@ export default {
         }
       });
 
-      // 鼠标双击事件 - 完成多边形绘制
+      // 鼠标双击事件 - 完成多线段绘制
       this.canvas.on("mouse:dblclick", (options) => {
         options.e.preventDefault();
-        if (!this.isDrawingPolygon || this.polygonPoints.length < 3) return;
+        if (!this.isDrawingPolygon || this.polylinePoints.length < 3) return;
 
-        this.finishPolygon();
+        this.finishPolyline();
       });
 
       // 对象移动事件 - 同步移动标签
@@ -288,7 +282,7 @@ export default {
       const activeObject = this.canvas.getActiveObject();
       if (
         !activeObject ||
-        (activeObject.type !== "rect" && activeObject.type !== "polygon")
+        (activeObject.type !== "rect" && activeObject.type !== "polyline")
       )
         return;
 
@@ -338,65 +332,66 @@ export default {
       }
     },
 
-    // 更新多边形形状
-    updatePolygon() {
-      if (!this.currentPolygon || this.polygonPoints.length < 2) return;
+    // 更新多线段形状
+    updatePolyline() {
+      if (!this.currentPolyline || this.polylinePoints.length < 2) return;
 
-      // 复制当前点并添加第一个点使多边形闭合
-      const points = [...this.polygonPoints, this.polygonPoints[0]];
-      this.currentPolygon.set({ points });
-      this.currentPolygon.setCoords();
+      const points = [...this.polylinePoints];
+      this.currentPolyline.set({ points });
+      this.currentPolyline.setCoords();
       this.canvas.renderAll();
     },
 
-    // 完成多边形绘制
-    finishPolygon() {
-      // 确保至少3个顶点
-      if (this.polygonPoints.length < 3) {
-        alert("多边形至少需要3个顶点");
+    // 完成多线段绘制
+    finishPolyline() {
+      // 确保至少2个顶点
+      if (this.polylinePoints.length < 2) {
+        alert("多线段至少需要2个顶点");
         this.cancelDrawing();
         return;
       }
 
-      // 创建最终多边形（闭合路径）
-      const finalPolygon = new fabric.Polygon(this.polygonPoints, {
+      this.polylinePoints.push(this.polylinePoints[0]); // 闭合多线段
+
+      // 创建最终多线段
+      const finalPolyline = new fabric.Polyline(this.polylinePoints, {
         fill: "rgba(173, 216, 230, 0.3)",
         stroke: "blue",
         strokeWidth: 2,
         selectable: true,
         objectCaching: true,
-        closed: true,
       });
 
-      // 移除临时多边形和辅助线
-      this.canvas.remove(this.currentPolygon);
+      // 移除临时多线段和辅助线
+      this.canvas.remove(this.currentPolyline);
+
       if (this.guideLine) {
         this.canvas.remove(this.guideLine);
       }
 
-      // 添加最终多边形
-      this.canvas.add(finalPolygon);
+      // 添加最终多线段
+      this.canvas.add(finalPolyline);
 
       // 选中绘制结果
-      this.selectObject(finalPolygon);
+      this.selectObject(finalPolyline);
 
       // 重置状态
       this.isDrawingPolygon = false;
-      this.polygonPoints = [];
-      this.currentPolygon = null;
+      this.polylinePoints = [];
+      this.currentPolyline = null;
       this.guideLine = null;
       this.canvas.selection = true;
       this.canvas.defaultCursor = "default";
       this.canvas.renderAll();
     },
 
-    // 绘制多边形
+    // 绘制多线段
     enableDrawingPolygon() {
       this.isDrawingPolygon = true;
       this.canvas.selection = false; // 禁用默认的选择行为
       this.canvas.defaultCursor = "crosshair"; // 设置鼠标样式为十字
-      this.polygonPoints = [];
-      this.currentPolygon = null;
+      this.polylinePoints = [];
+      this.currentPolyline = null;
       this.guideLine = null;
 
       this.isDrawingRect = false;
@@ -411,8 +406,8 @@ export default {
       this.canvas.defaultCursor = "crosshair"; // 设置鼠标样式为十字
 
       this.isDrawingPolygon = false;
-      this.polygonPoints = [];
-      this.currentPolygon = null;
+      this.polylinePoints = [];
+      this.currentPolyline = null;
       this.guideLine = null;
     },
 

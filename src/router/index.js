@@ -75,6 +75,11 @@ const routes = [
     name: "fabricjs",
     component: () => import("../views/fabricjs/index.vue"),
   },
+  {
+    path: "/fabricjs-by-line",
+    name: "fabricjsByLine",
+    component: () => import("../views/fabricjs/byLine.vue"),
+  },
 ];
 
 const router = new VueRouter({
